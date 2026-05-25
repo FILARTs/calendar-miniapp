@@ -127,24 +127,16 @@ function renderCalendar() {
         dayEl.className = 'day';
         dayEl.innerText = d;
 
-        const dateStr =
-            `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+		const data = availability[dateStr];
+		const status = typeof data === "string" ? data : data?.status || "none";
 
-        const data = availability[dateStr];
+		if (status === "pending") {
+			dayEl.classList.add("pending");
+		}
 
-        const status = typeof data === "string" ? data : data?.status;
-
-        if (status === "busy") {
-            dayEl.classList.add("busy");
-        }
-
-        if (status === "approved") {
-            dayEl.classList.add("free");
-        }
-
-        if (status === "pending") {
-            dayEl.classList.add("busy");
-        }
+		if (status === "approved") {
+			dayEl.classList.add("approved");
+		}
 
         const today = new Date();
 
@@ -174,17 +166,27 @@ function renderCalendar() {
 }
 
 function openDayPanel(dateStr) {
+    selectedDate = dateStr;
+
     const panel = document.getElementById("dayPanel");
-    panel.style.display = "block";
+    const backdrop = document.getElementById("sheetBackdrop");
 
     const data = availability[dateStr] || {
-        status: "free",
+        status: "none",
         note: ""
     };
 
     document.getElementById("panelDate").innerText = dateStr;
     document.getElementById("statusSelect").value = data.status;
     document.getElementById("noteInput").value = data.note;
+
+    panel.classList.add("open");
+    backdrop.style.display = "block";
+}
+
+function closeSheet() {
+    document.getElementById("dayPanel").classList.remove("open");
+    document.getElementById("sheetBackdrop").style.display = "none";
 }
 
 document.getElementById("saveDayBtn").onclick = () => {
@@ -193,7 +195,8 @@ document.getElementById("saveDayBtn").onclick = () => {
         note: document.getElementById("noteInput").value
     };
 
-    document.getElementById("dayPanel").style.display = "none";
-
+    closeSheet();
     renderCalendar();
 };
+
+document.getElementById("sheetBackdrop").onclick = closeSheet;
