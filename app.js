@@ -93,16 +93,16 @@ function renderCalendar() {
     const month = currentDate.getMonth();
 
     const monthNames = [
-        "January","February","March",
-        "April","May","June",
-        "July","August","September",
-        "October","November","December"
+        "Январь", "Февраль", "Март",
+        "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь",
+        "Октябрь", "Ноябрь", "Декабрь"
     ];
 
     document.getElementById('month-year').innerText =
         `${monthNames[month]} ${year}`;
 
-    const daysOfWeek = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const daysOfWeek = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
     daysOfWeek.forEach(day => {
         const el = document.createElement('div');
@@ -127,9 +127,14 @@ function renderCalendar() {
         const dateStr =
             `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
+        const dateDisplay =
+            `${String(d).padStart(2,'0')}.${String(month + 1).padStart(2,'0')}.${year}`;
+
         const dayEl = document.createElement('div');
         dayEl.className = 'day';
-        dayEl.innerText = d;
+
+        // показываем ДД.ММ.ГГГГ внутри клетки
+        dayEl.innerText = dateDisplay;
 
         const data = availability[dateStr];
         const status = typeof data === "string"
