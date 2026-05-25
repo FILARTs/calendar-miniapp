@@ -93,16 +93,16 @@ function renderCalendar() {
     const month = currentDate.getMonth();
 
     const monthNames = [
-        "January", "February", "March",
-        "April", "May", "June",
-        "July", "August", "September",
-        "October", "November", "December"
+        "January","February","March",
+        "April","May","June",
+        "July","August","September",
+        "October","November","December"
     ];
 
     document.getElementById('month-year').innerText =
         `${monthNames[month]} ${year}`;
 
-    const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const daysOfWeek = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
     daysOfWeek.forEach(day => {
         const el = document.createElement('div');
@@ -116,30 +116,30 @@ function renderCalendar() {
     const prevMonthLastDay = new Date(year, month, 0).getDate();
 
     for (let i = firstDayOfMonth; i > 0; i--) {
-        const dayEl = document.createElement('div');
-        dayEl.className = 'day other-month';
-        dayEl.innerText = prevMonthLastDay - i + 1;
-        gridEl.appendChild(dayEl);
+        const el = document.createElement('div');
+        el.className = 'day other-month';
+        el.innerText = prevMonthLastDay - i + 1;
+        gridEl.appendChild(el);
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
+
+        const dateStr =
+            `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
         const dayEl = document.createElement('div');
         dayEl.className = 'day';
         dayEl.innerText = d;
 
-		const data = availability[dateStr];
-		const status = typeof data === "string" ? data : data?.status || "none";
+        const data = availability[dateStr];
+        const status = typeof data === "string"
+            ? data
+            : data?.status || "none";
 
-		if (status === "pending") {
-			dayEl.classList.add("pending");
-		}
-
-		if (status === "approved") {
-			dayEl.classList.add("approved");
-		}
+        if (status === "pending") dayEl.classList.add("pending");
+        if (status === "approved") dayEl.classList.add("approved");
 
         const today = new Date();
-
         if (
             d === today.getDate() &&
             month === today.getMonth() &&
@@ -150,14 +150,6 @@ function renderCalendar() {
 
         dayEl.onclick = () => {
             selectedDate = dateStr;
-
-            if (!availability[dateStr] || typeof availability[dateStr] === "string") {
-                availability[dateStr] = {
-                    status: availability[dateStr] || "free",
-                    note: ""
-                };
-            }
-
             openDayPanel(dateStr);
         };
 
