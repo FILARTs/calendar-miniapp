@@ -120,8 +120,8 @@ button:active {
     transform: translate(-50%, 100%);
     bottom: 0;
 
-    width: 100%;
-    max-width: 400px;
+    width: calc(100% - 20px);
+    max-width: 380px;
 
     background: var(--tg-theme-secondary-bg-color, #fff);
     border-radius: 16px 16px 0 0;
@@ -142,6 +142,13 @@ button:active {
     background: rgba(150,150,150,0.5);
     border-radius: 10px;
     margin: 0 auto 10px auto;
+}
+
+#noteInput {
+    height: 120px;
+    min-height: 100px;
+    max-height: 180px;
+    resize: none;
 }
 
 /* TG INPUTS */
