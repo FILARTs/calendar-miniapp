@@ -1,0 +1,83 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+#calendar-container {
+    width: 100%;
+    max-width: 400px;
+    background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+    border-radius: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+.day-name {
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding-bottom: 5px;
+}
+.day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    background: var(--tg-theme-bg-color, #ffffff);
+    transition: background 0.2s;
+}
+.day.other-month {
+    opacity: 0.3;
+}
+.day.busy {
+    background-color: #ff4d4d;
+    color: white;
+}
+.day.free {
+    background-color: #4caf50;
+    color: white;
+}
+.day.today {
+    border: 2px solid var(--tg-theme-button-color, #2481cc);
+}
+.controls {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--tg-theme-button-color, #2481cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    cursor: pointer;
+    width: 100%;
+}
+button:active {
+    opacity: 0.8;
+}

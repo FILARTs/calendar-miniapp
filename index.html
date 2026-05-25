@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Availability Calendar</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h2 id="month-year"></h2>
+
+    <div id="calendar-container">
+
+        <div class="calendar-header">
+            <button id="prevMonth" style="width:auto;padding:5px 10px;">
+                &lt;
+            </button>
+
+            <span id="month-display"></span>
+
+            <button id="nextMonth" style="width:auto;padding:5px 10px;">
+                &gt;
+            </button>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid">
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button id="saveBtn">
+            Save Availability
+        </button>
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
