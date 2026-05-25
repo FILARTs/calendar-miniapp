@@ -1,16 +1,21 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
+let selectedDate = null;
 let currentDate = new Date();
 let availability = {};
 let userId = null;
 
-const gridEl = document.getElementById('calendar-grid');
-const prevBtn = document.getElementById('prevMonth');
-const nextBtn = document.getElementById('nextMonth');
-const saveBtn = document.getElementById('saveBtn');
+let gridEl, prevBtn, nextBtn, saveBtn;
+
+document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+    gridEl = document.getElementById('calendar-grid');
+    prevBtn = document.getElementById('prevMonth');
+    nextBtn = document.getElementById('nextMonth');
+    saveBtn = document.getElementById('saveBtn');
+
     const initData = tg.initDataUnsafe;
 
     if (initData && initData.user) {
@@ -19,13 +24,52 @@ async function init() {
         try {
             await fetchAvailability();
         } catch (e) {
-            console.error(e);
+            console.error("Fetch error:", e);
         }
     } else {
         console.error("Telegram user not found");
     }
 
     renderCalendar();
+    bindButtons();
+}
+
+function bindButtons() {
+    prevBtn.onclick = () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    };
+
+    nextBtn.onclick = () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    };
+
+    saveBtn.onclick = async () => {
+        if (!userId) return;
+
+        try {
+            const response = await fetch(
+                `https://YOUR_API_URL/api/availability/${userId}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(availability)
+                }
+            );
+
+            if (response.ok) {
+                tg.showAlert("Saved!");
+            } else {
+                tg.showAlert("Save error");
+            }
+
+        } catch (e) {
+            tg.showAlert(e.message);
+        }
+    };
 }
 
 async function fetchAvailability() {
@@ -80,19 +124,26 @@ function renderCalendar() {
 
     for (let d = 1; d <= daysInMonth; d++) {
         const dayEl = document.createElement('div');
-
         dayEl.className = 'day';
         dayEl.innerText = d;
 
         const dateStr =
             `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
-        if (availability[dateStr] === 'busy') {
-            dayEl.classList.add('busy');
+        const data = availability[dateStr];
+
+        const status = typeof data === "string" ? data : data?.status;
+
+        if (status === "busy") {
+            dayEl.classList.add("busy");
         }
 
-        if (availability[dateStr] === 'free') {
-            dayEl.classList.add('free');
+        if (status === "approved") {
+            dayEl.classList.add("free");
+        }
+
+        if (status === "pending") {
+            dayEl.classList.add("busy");
         }
 
         const today = new Date();
@@ -106,55 +157,43 @@ function renderCalendar() {
         }
 
         dayEl.onclick = () => {
-            if (availability[dateStr] === 'busy') {
-                availability[dateStr] = 'free';
-            } else if (availability[dateStr] === 'free') {
-                availability[dateStr] = 'busy';
-            } else {
-                availability[dateStr] = 'busy';
+            selectedDate = dateStr;
+
+            if (!availability[dateStr] || typeof availability[dateStr] === "string") {
+                availability[dateStr] = {
+                    status: availability[dateStr] || "free",
+                    note: ""
+                };
             }
 
-            renderCalendar();
+            openDayPanel(dateStr);
         };
 
         gridEl.appendChild(dayEl);
     }
 }
 
-prevBtn.onclick = () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
+function openDayPanel(dateStr) {
+    const panel = document.getElementById("dayPanel");
+    panel.style.display = "block";
+
+    const data = availability[dateStr] || {
+        status: "free",
+        note: ""
+    };
+
+    document.getElementById("panelDate").innerText = dateStr;
+    document.getElementById("statusSelect").value = data.status;
+    document.getElementById("noteInput").value = data.note;
+}
+
+document.getElementById("saveDayBtn").onclick = () => {
+    availability[selectedDate] = {
+        status: document.getElementById("statusSelect").value,
+        note: document.getElementById("noteInput").value
+    };
+
+    document.getElementById("dayPanel").style.display = "none";
+
     renderCalendar();
 };
-
-nextBtn.onclick = () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
-};
-
-saveBtn.onclick = async () => {
-    if (!userId) return;
-
-    try {
-        const response = await fetch(
-            `https://YOUR_API_URL/api/availability/${userId}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(availability)
-            }
-        );
-
-        if (response.ok) {
-            tg.showAlert("Saved!");
-        } else {
-            tg.showAlert("Save error");
-        }
-
-    } catch (e) {
-        tg.showAlert(e.message);
-    }
-};
-
-init();
