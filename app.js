@@ -127,14 +127,9 @@ function renderCalendar() {
         const dateStr =
             `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
-        const dateDisplay =
-            `${String(d).padStart(2,'0')}.${String(month + 1).padStart(2,'0')}.${year}`;
-
         const dayEl = document.createElement('div');
         dayEl.className = 'day';
-
-        // показываем ДД.ММ.ГГГГ внутри клетки
-        dayEl.innerText = dateDisplay;
+        dayEl.innerText = d;
 
         const data = availability[dateStr];
         const status = typeof data === "string"
@@ -173,7 +168,8 @@ function openDayPanel(dateStr) {
         note: ""
     };
 
-    document.getElementById("panelDate").innerText = dateStr;
+    document.getElementById("panelDate").innerText =
+    new Date(dateStr).toLocaleDateString("ru-RU");
     document.getElementById("statusSelect").value = data.status;
     document.getElementById("noteInput").value = data.note;
 
