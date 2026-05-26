@@ -120,8 +120,8 @@ button:active {
     transform: translate(-50%, 100%);
     bottom: 0;
 
-    width: calc(100% - 20px);
-    max-width: 360px;
+    width: calc(100% - 40px);
+    max-width: 380px;
 
     background: var(--tg-theme-secondary-bg-color, #fff);
     border-radius: 16px 16px 0 0;
