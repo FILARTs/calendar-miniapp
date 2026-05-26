@@ -1,11 +1,12 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
+const API_URL = "https://material-organised-ind-exist.trycloudflare.com";
+
 let selectedDate = null;
 let currentDate = new Date();
 let availability = {};
 let userId = null;
-
 let gridEl, prevBtn, nextBtn;
 
 document.addEventListener("DOMContentLoaded", init);
@@ -98,9 +99,7 @@ function debounce(fn, delay) {
 
 async function fetchAvailability() {
 
-    const response = await fetch(
-        `https://YOUR_API_URL/api/availability/${userId}`
-    );
+    const response = await fetch(`${API_URL}/api/availability/${userId}`);
 
     if (response.ok) {
         availability = await response.json();
@@ -113,16 +112,13 @@ async function syncAvailability() {
 
     try {
 
-        await fetch(
-            `https://YOUR_API_URL/api/availability/${userId}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(availability)
-            }
-        );
+		await fetch(`${API_URL}/api/availability/${userId}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(availability)
+		});
 
     } catch (e) {
         console.error("Sync error:", e);
