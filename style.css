@@ -120,7 +120,7 @@ button:active {
     transform: translate(-50%, 100%);
     bottom: 0;
 
-    width: calc(100% - 40px);
+    width: calc(100% - 20px);
     max-width: 380px;
 
     background: var(--tg-theme-secondary-bg-color, #fff);
@@ -148,6 +148,7 @@ button:active {
     height: 120px;
     min-height: 100px;
     max-height: 180px;
+	box-sizing: border-box;
     resize: none;
 }
 
@@ -159,6 +160,8 @@ button:active {
     border-radius: 8px;
     border: none;
     outline: none;
+
+	box-sizing: border-box;
 
     background: var(--tg-theme-bg-color, #ffffff);
     color: var(--tg-theme-text-color, #000000);
