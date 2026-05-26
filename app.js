@@ -1,7 +1,7 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const API_URL = "https://material-organised-ind-exist.trycloudflare.com";
+const API_URL = window.location.origin;
 
 let selectedDate = null;
 let currentDate = new Date();
