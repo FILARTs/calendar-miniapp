@@ -1,8 +1,6 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const API_URL = window.location.origin;
-
 let selectedDate = null;
 let currentDate = new Date();
 let availability = {};
@@ -33,6 +31,8 @@ async function init() {
     bindButtons();
     bindSwipe();
     bindAutosave();
+
+    document.getElementById("sheetBackdrop").onclick = closeSheet;
 }
 
 function bindButtons() {
@@ -51,7 +51,6 @@ function bindButtons() {
 function bindSwipe() {
 
     let startX = 0;
-
     const container = document.getElementById("calendar-container");
 
     container.addEventListener("touchstart", e => {
@@ -90,16 +89,13 @@ function debounce(fn, delay) {
 
     return (...args) => {
         clearTimeout(timer);
-
-        timer = setTimeout(() => {
-            fn(...args);
-        }, delay);
+        timer = setTimeout(() => fn(...args), delay);
     };
 }
 
 async function fetchAvailability() {
 
-    const response = await fetch(`${API_URL}/api/availability/${userId}`);
+    const response = await fetch(`/api/availability/${userId}`);
 
     if (response.ok) {
         availability = await response.json();
@@ -111,14 +107,13 @@ async function syncAvailability() {
     if (!userId) return;
 
     try {
-
-		await fetch(`${API_URL}/api/availability/${userId}`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify(availability)
-		});
+        await fetch(`/api/availability/${userId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(availability)
+        });
 
     } catch (e) {
         console.error("Sync error:", e);
@@ -145,12 +140,9 @@ function renderCalendar() {
     const daysOfWeek = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
     daysOfWeek.forEach(day => {
-
         const el = document.createElement('div');
-
         el.className = 'day-name';
         el.innerText = day;
-
         gridEl.appendChild(el);
     });
 
@@ -159,12 +151,9 @@ function renderCalendar() {
     const prevMonthLastDay = new Date(year, month, 0).getDate();
 
     for (let i = firstDayOfMonth; i > 0; i--) {
-
         const el = document.createElement('div');
-
         el.className = 'day other-month';
         el.innerText = prevMonthLastDay - i + 1;
-
         gridEl.appendChild(el);
     }
 
@@ -179,16 +168,10 @@ function renderCalendar() {
         dayEl.innerText = d;
 
         const data = availability[dateStr];
-
         const status = data?.status || "none";
 
-        if (status === "pending") {
-            dayEl.classList.add("pending");
-        }
-
-        if (status === "approved") {
-            dayEl.classList.add("approved");
-        }
+        if (status === "pending") dayEl.classList.add("pending");
+        if (status === "approved") dayEl.classList.add("approved");
 
         const today = new Date();
 
@@ -200,9 +183,7 @@ function renderCalendar() {
             dayEl.classList.add('today');
         }
 
-        dayEl.onclick = () => {
-            openDayPanel(dateStr);
-        };
+        dayEl.onclick = () => openDayPanel(dateStr);
 
         gridEl.appendChild(dayEl);
     }
@@ -232,11 +213,8 @@ function openDayPanel(dateStr) {
 
 function closeSheet() {
 
-    document.getElementById("dayPanel")
-        .classList.remove("open");
-
-    document.getElementById("sheetBackdrop")
-        .style.display = "none";
+    document.getElementById("dayPanel").classList.remove("open");
+    document.getElementById("sheetBackdrop").style.display = "none";
 }
 
 async function saveCurrentDay() {
@@ -249,8 +227,5 @@ async function saveCurrentDay() {
     };
 
     renderCalendar();
-
     await syncAvailability();
 }
-
-document.getElementById("sheetBackdrop").onclick = closeSheet;
