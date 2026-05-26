@@ -98,14 +98,43 @@ function debounce(fn, delay) {
     };
 }
 
+
+function normalizeKey(key) {
+
+    // уже норм
+    if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+        return key;
+    }
+
+    // 29.05 или 29.05 (пятница)
+    const m = key.match(/(\d{1,2})\.(\d{1,2})/);
+    if (m) {
+        const day = m[1].padStart(2,'0');
+        const month = m[2].padStart(2,'0');
+        const year = new Date().getFullYear();
+        return `${year}-${month}-${day}`;
+    }
+
+    return key;
+}
+
+
 async function fetchAvailability() {
 
-    const response = await fetch(
-        `${API_URL}/api/availability/${userId}`
-    );
+    const response = await fetch(`${API_URL}/api/availability/${userId}`);
 
     if (response.ok) {
-        availability = await response.json();
+
+        const raw = await response.json();
+
+        availability = {};
+
+        for (const [key, value] of Object.entries(raw)) {
+
+            const normalized = normalizeKey(key);
+
+            availability[normalized] = value;
+        }
     }
 }
 
