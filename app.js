@@ -278,9 +278,18 @@ async function saveCurrentDay() {
 
     if (!selectedDate) return;
 
+    const status = document.getElementById("statusSelect").value;
+    let note = document.getElementById("noteInput").value;
+
+    // если Нет занятости → удаляем заметку
+    if (status === "none") {
+        note = "";
+        document.getElementById("noteInput").value = ""; // обновляем поле сразу
+    }
+
     availability[selectedDate] = {
-        status: document.getElementById("statusSelect").value,
-        note: document.getElementById("noteInput").value
+        status: status,
+        note: note
     };
 
     renderCalendar();
