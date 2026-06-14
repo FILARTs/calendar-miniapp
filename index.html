@@ -28,9 +28,39 @@
 
         <div class="calendar-grid" id="calendar-grid"></div>
 
+        <!-- АНКЕТЫ -->
+
+        <div class="profiles-section">
+
+            <button
+                class="tg-button"
+                onclick="openProfileSheet(1)"
+            >
+                Анкета 1
+            </button>
+
+            <button
+                class="tg-button"
+                onclick="openProfileSheet(2)"
+            >
+                Анкета 2
+            </button>
+
+            <button
+                class="tg-button"
+                onclick="openProfileSheet(3)"
+            >
+                Анкета 3
+            </button>
+
+        </div>
+
     </div>
 
+    <!-- ПАНЕЛЬ КАЛЕНДАРЯ -->
+
     <div id="dayPanel" class="sheet">
+
         <div class="sheet-handle"></div>
 
         <h3 id="panelDate"></h3>
@@ -46,6 +76,48 @@
             class="tg-input"
             placeholder="Заметка..."
         ></textarea>
+
+    </div>
+
+    <!-- ПАНЕЛЬ АНКЕТ -->
+
+    <div id="profileSheet" class="sheet">
+
+        <div class="sheet-handle"></div>
+
+        <h3 id="profileTitle">
+            Анкета
+        </h3>
+
+        <textarea
+            id="profileInput"
+            class="tg-input"
+            placeholder="Введите текст анкеты..."
+        ></textarea>
+
+        <button
+            class="tg-button"
+            onclick="saveProfile()"
+        >
+            💾 Сохранить
+        </button>
+
+        <button
+            class="tg-button"
+            onclick="copyProfile()"
+        >
+            📋 Скопировать
+        </button>
+
+        <button
+            id="openChatBtn"
+            class="tg-button"
+            style="display:none;"
+            onclick="openCastingChat()"
+        >
+            ✈️ Открыть чат кастинг-директора
+        </button>
+
     </div>
 
     <div id="sheetBackdrop"></div>

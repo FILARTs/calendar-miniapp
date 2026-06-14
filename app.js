@@ -6,13 +6,34 @@ const API_URL = "https://api.filartapp.ru";
 let selectedDate = null;
 let currentDate = new Date();
 let availability = {};
+let profiles = {};
+let currentProfileId = 1;
 let userId = null;
-
 let gridEl, prevBtn, nextBtn;
+
+// 🔥 ВМЕСТО СТРОКИ — СТРУКТУРА
+let castingContact = null;
 
 document.addEventListener("DOMContentLoaded", init);
 
+function normalizeContact(value) {
+    if (!value) return null;
+
+    if (value.startsWith("@")) {
+        return { type: "username", value: value.replace("@", "") };
+    }
+
+	if (value.startsWith("+")) {
+		return { type: "phone", value: value };
+	}
+
+    return { type: "username", value: value };
+}
+
 async function init() {
+
+    const params = new URLSearchParams(window.location.search);
+    castingContact = normalizeContact(params.get("contact"));
 
     gridEl = document.getElementById('calendar-grid');
     prevBtn = document.getElementById('prevMonth');
@@ -25,6 +46,7 @@ async function init() {
 
         try {
             await fetchAvailability();
+            await fetchProfiles();
         } catch (e) {
             console.error(e);
         }
@@ -34,7 +56,42 @@ async function init() {
     bindButtons();
     bindSwipe();
     bindAutosave();
+    updateChatButton();
+
+    document.getElementById("sheetBackdrop").onclick = closeSheet;
 }
+
+/* ---------------- CHAT ---------------- */
+
+function openCastingChat() {
+    if (!castingContact?.value) return;
+
+    if (castingContact.type === "username") {
+        tg.openTelegramLink(`tg://resolve?domain=${castingContact.value}`);
+        return;
+    }
+
+    if (castingContact.type === "phone") {
+        tg.openTelegramLink(`https://t.me/${castingContact.value}`);
+        return;
+    }
+
+    tg.openTelegramLink(`https://t.me/${castingContact.value}`);
+}
+
+function updateChatButton() {
+    const btn = document.getElementById("openChatBtn");
+
+    if (!castingContact?.value) {
+        btn.style.display = "none";
+        return;
+    }
+
+    btn.style.display = "block";
+    btn.innerText = "✈️ Отправить";
+}
+
+/* ---------------- CALENDAR UI ---------------- */
 
 function bindButtons() {
 
@@ -52,7 +109,6 @@ function bindButtons() {
 function bindSwipe() {
 
     let startX = 0;
-
     const container = document.getElementById("calendar-container");
 
     container.addEventListener("touchstart", e => {
@@ -61,16 +117,13 @@ function bindSwipe() {
 
     container.addEventListener("touchend", e => {
 
-        const endX = e.changedTouches[0].clientX;
-        const diff = endX - startX;
+        const diff = e.changedTouches[0].clientX - startX;
 
         if (Math.abs(diff) < 50) return;
 
-        if (diff > 0) {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-        } else {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-        }
+        currentDate.setMonth(
+            currentDate.getMonth() + (diff > 0 ? -1 : 1)
+        );
 
         renderCalendar();
     });
@@ -91,23 +144,20 @@ function debounce(fn, delay) {
 
     return (...args) => {
         clearTimeout(timer);
-
-        timer = setTimeout(() => {
-            fn(...args);
-        }, delay);
+        timer = setTimeout(() => fn(...args), delay);
     };
 }
 
+/* ---------------- DATE ---------------- */
 
 function normalizeKey(key) {
 
-    // уже норм
     if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
         return key;
     }
 
-    // 29.05 или 29.05 (пятница)
     const m = key.match(/(\d{1,2})\.(\d{1,2})/);
+
     if (m) {
         const day = m[1].padStart(2,'0');
         const month = m[2].padStart(2,'0');
@@ -118,23 +168,20 @@ function normalizeKey(key) {
     return key;
 }
 
+/* ---------------- API ---------------- */
 
 async function fetchAvailability() {
 
     const response = await fetch(`${API_URL}/api/availability/${userId}`);
 
-    if (response.ok) {
+    if (!response.ok) return;
 
-        const raw = await response.json();
+    const raw = await response.json();
 
-        availability = {};
+    availability = {};
 
-        for (const [key, value] of Object.entries(raw)) {
-
-            const normalized = normalizeKey(key);
-
-            availability[normalized] = value;
-        }
+    for (const [key, value] of Object.entries(raw)) {
+        availability[normalizeKey(key)] = value;
     }
 }
 
@@ -143,22 +190,17 @@ async function syncAvailability() {
     if (!userId) return;
 
     try {
-
-        await fetch(
-            `${API_URL}/api/availability/${userId}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(availability)
-            }
-        );
-
+        await fetch(`${API_URL}/api/availability/${userId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(availability)
+        });
     } catch (e) {
-        console.error("Sync error:", e);
+        console.error(e);
     }
 }
+
+/* ---------------- RENDER ---------------- */
 
 function renderCalendar() {
 
@@ -168,10 +210,8 @@ function renderCalendar() {
     const month = currentDate.getMonth();
 
     const monthNames = [
-        "Январь","Февраль","Март",
-        "Апрель","Май","Июнь",
-        "Июль","Август","Сентябрь",
-        "Октябрь","Ноябрь","Декабрь"
+        "Январь","Февраль","Март","Апрель","Май","Июнь",
+        "Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"
     ];
 
     document.getElementById('month-year').innerText =
@@ -179,51 +219,37 @@ function renderCalendar() {
 
     const daysOfWeek = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
-    daysOfWeek.forEach(day => {
-
+    daysOfWeek.forEach(d => {
         const el = document.createElement('div');
-
         el.className = 'day-name';
-        el.innerText = day;
-
+        el.innerText = d;
         gridEl.appendChild(el);
     });
 
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    const prevLast = new Date(year, month, 0).getDate();
 
-    for (let i = firstDayOfMonth; i > 0; i--) {
-
+    for (let i = firstDay; i > 0; i--) {
         const el = document.createElement('div');
-
         el.className = 'day other-month';
-        el.innerText = prevMonthLastDay - i + 1;
-
+        el.innerText = prevLast - i + 1;
         gridEl.appendChild(el);
     }
 
     for (let d = 1; d <= daysInMonth; d++) {
 
         const dateStr =
-            `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
-        const dayEl = document.createElement('div');
+        const el = document.createElement('div');
+        el.className = 'day';
+        el.innerText = d;
 
-        dayEl.className = 'day';
-        dayEl.innerText = d;
+        const status = availability[dateStr]?.status || "none";
 
-        const data = availability[dateStr];
-
-        const status = data?.status || "none";
-
-        if (status === "pending") {
-            dayEl.classList.add("pending");
-        }
-
-        if (status === "approved") {
-            dayEl.classList.add("approved");
-        }
+        if (status === "pending") el.classList.add("pending");
+        if (status === "approved") el.classList.add("approved");
 
         const today = new Date();
 
@@ -232,23 +258,20 @@ function renderCalendar() {
             month === today.getMonth() &&
             year === today.getFullYear()
         ) {
-            dayEl.classList.add('today');
+            el.classList.add("today");
         }
 
-        dayEl.onclick = () => {
-            openDayPanel(dateStr);
-        };
+        el.onclick = () => openDayPanel(dateStr);
 
-        gridEl.appendChild(dayEl);
+        gridEl.appendChild(el);
     }
 }
+
+/* ---------------- DAY ---------------- */
 
 function openDayPanel(dateStr) {
 
     selectedDate = dateStr;
-
-    const panel = document.getElementById("dayPanel");
-    const backdrop = document.getElementById("sheetBackdrop");
 
     const data = availability[dateStr] || {
         status: "none",
@@ -261,17 +284,13 @@ function openDayPanel(dateStr) {
     document.getElementById("statusSelect").value = data.status;
     document.getElementById("noteInput").value = data.note;
 
-    panel.classList.add("open");
-    backdrop.style.display = "block";
+    document.getElementById("dayPanel").classList.add("open");
+    document.getElementById("sheetBackdrop").style.display = "block";
 }
 
 function closeSheet() {
-
-    document.getElementById("dayPanel")
-        .classList.remove("open");
-
-    document.getElementById("sheetBackdrop")
-        .style.display = "none";
+    document.getElementById("dayPanel").classList.remove("open");
+    document.getElementById("sheetBackdrop").style.display = "none";
 }
 
 async function saveCurrentDay() {
@@ -281,20 +300,76 @@ async function saveCurrentDay() {
     const status = document.getElementById("statusSelect").value;
     let note = document.getElementById("noteInput").value;
 
-    // если Нет занятости → удаляем заметку
     if (status === "none") {
         note = "";
-        document.getElementById("noteInput").value = ""; // обновляем поле сразу
+        document.getElementById("noteInput").value = "";
     }
 
-    availability[selectedDate] = {
-        status: status,
-        note: note
-    };
+    availability[selectedDate] = { status, note };
 
     renderCalendar();
-
     await syncAvailability();
 }
 
-document.getElementById("sheetBackdrop").onclick = closeSheet;
+/* ---------------- PROFILES ---------------- */
+
+async function fetchProfiles() {
+
+    const response = await fetch(`${API_URL}/api/profiles/${userId}`);
+    if (!response.ok) return;
+
+    profiles = await response.json();
+    renderProfileButtons();
+}
+
+function renderProfileButtons() {
+
+    for (let i = 1; i <= 3; i++) {
+
+        const btn = document.querySelector(`[onclick="openProfileSheet(${i})"]`);
+        if (!btn) continue;
+
+        const title = profiles?.[i]?.title;
+        btn.innerText = title?.trim() ? title : `Анкета ${i}`;
+    }
+}
+
+function openProfileSheet(id) {
+
+    currentProfileId = id;
+
+    const data = profiles[id] || { title: "", text: "" };
+
+    document.getElementById("profileTitle").innerText = `Анкета ${id}`;
+    document.getElementById("profileInput").value = data.text;
+
+    document.getElementById("profileSheet").classList.add("open");
+    document.getElementById("sheetBackdrop").style.display = "block";
+}
+
+async function saveProfile() {
+
+    const text = document.getElementById("profileInput").value;
+    const title = document.getElementById("profileTitle").innerText;
+
+    profiles[currentProfileId] = {
+        title: title.replace("Анкета ", ""),
+        text
+    };
+
+    await fetch(`${API_URL}/api/profiles/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profiles)
+    });
+
+    tg.showAlert("Анкета сохранена");
+}
+
+async function copyProfile() {
+
+    const text = document.getElementById("profileInput").value;
+    await navigator.clipboard.writeText(text);
+
+    tg.showAlert("Скопировано");
+}

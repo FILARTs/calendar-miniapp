@@ -180,3 +180,58 @@ button:active {
 
     cursor: pointer;
 }
+
+/* =========================
+   АНКЕТЫ
+   ========================= */
+
+.profiles-section {
+    margin-top: 12px;
+
+    display: flex;
+    gap: 8px;
+
+    width: 100%;
+}
+
+.profiles-section .tg-button {
+    flex: 1;
+
+    margin-top: 0;
+    padding: 10px 5px;
+
+    font-size: 0.85rem;
+}
+
+/* =========================
+   АНКЕТА
+   ========================= */
+
+#profileInput {
+    height: 220px;
+    min-height: 180px;
+    max-height: 320px;
+
+    resize: vertical;
+    box-sizing: border-box;
+
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+#profileTitle {
+    margin: 0;
+    text-align: center;
+}
+
+/* чтобы кнопки в анкете красиво шли друг под другом */
+
+#profileSheet .tg-button {
+    margin-top: 10px;
+}
+
+/* кнопка открытия чата */
+
+#openChatBtn {
+    margin-top: 15px;
+}
