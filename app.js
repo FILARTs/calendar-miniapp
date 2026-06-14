@@ -16,24 +16,19 @@ let castingContact = null;
 
 document.addEventListener("DOMContentLoaded", init);
 
-function normalizeContact(value) {
+function normalizeContact(type, value) {
     if (!value) return null;
 
-    value = value.trim();
-
-    // EMAIL — САМЫЙ ЖЁСТКИЙ ПРИОРИТЕТ
-    if (value.includes("@") && value.includes(".")) {
+    if (type === "email") {
         return { type: "email", value };
     }
 
-    // TELEGRAM USERNAME
-    if (value.startsWith("@")) {
-        return { type: "username", value: value.slice(1) };
+    if (type === "phone") {
+        return { type: "phone", value };
     }
 
-    // PHONE
-    if (value.startsWith("+")) {
-        return { type: "phone", value };
+    if (type === "username") {
+        return { type: "username", value: value.replace("@", "") };
     }
 
     return null;
@@ -42,7 +37,10 @@ function normalizeContact(value) {
 async function init() {
 
     const params = new URLSearchParams(window.location.search);
-    castingContact = normalizeContact(params.get("contact"));
+    castingContact = normalizeContact(
+    params.get("type"),
+    params.get("value")
+	);
 
     gridEl = document.getElementById('calendar-grid');
     prevBtn = document.getElementById('prevMonth');
@@ -79,26 +77,25 @@ function openCastingChat() {
         return;
     }
 
-    const { type, value } = castingContact;
+    const v = castingContact.value;
 
+    // 🔥 СНАЧАЛА закрываем
     tg.close();
 
+    // 🔥 потом даём Telegram открыть чат
     setTimeout(() => {
 
-        if (type === "username") {
-            window.open(`https://t.me/${value}`, "_blank");
+        if (castingContact.type === "username") {
+            window.open(`https://t.me/${v}`, "_blank");
             return;
         }
 
-        if (type === "phone") {
-            window.open(`https://t.me/${value}`, "_blank");
+        if (castingContact.type === "phone") {
+            window.open(`https://t.me/+${v}`, "_blank");
             return;
         }
 
-        if (type === "email") {
-            window.open(`mailto:${value}`, "_blank");
-            return;
-        }
+        window.open(`https://t.me/${v}`, "_blank");
 
     }, 50);
 }
