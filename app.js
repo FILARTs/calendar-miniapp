@@ -64,23 +64,32 @@ async function init() {
 /* ---------------- CHAT ---------------- */
 
 function openCastingChat() {
-    if (!castingContact?.value) return;
+
+    console.log("CLICK", castingContact);
+
+    if (!castingContact?.value) {
+        tg.showAlert("Нет контакта");
+        return;
+    }
+
+    const v = castingContact.value;
 
     if (castingContact.type === "username") {
-        tg.openTelegramLink(`tg://resolve?domain=${castingContact.value}`);
+        tg.openTelegramLink(`https://t.me/${v}`);
         return;
     }
 
     if (castingContact.type === "phone") {
-        tg.openTelegramLink(`https://t.me/${castingContact.value}`);
+        tg.openTelegramLink(`https://t.me/+${v}`);
         return;
     }
 
-    tg.openTelegramLink(`https://t.me/${castingContact.value}`);
+    tg.openTelegramLink(`https://t.me/${v}`);
 }
 
 function updateChatButton() {
     const btn = document.getElementById("openChatBtn");
+    if (!btn) return;
 
     if (!castingContact?.value) {
         btn.style.display = "none";
@@ -289,8 +298,16 @@ function openDayPanel(dateStr) {
 }
 
 function closeSheet() {
-    document.getElementById("dayPanel").classList.remove("open");
-    document.getElementById("sheetBackdrop").style.display = "none";
+
+    document.getElementById("dayPanel")
+        .classList.remove("open");
+
+    document.getElementById("profileSheet")
+        .classList.remove("open");
+
+    const b = document.getElementById("sheetBackdrop");
+
+    b.style.display = "none";
 }
 
 async function saveCurrentDay() {
