@@ -74,21 +74,15 @@ function openCastingChat() {
 
     const v = castingContact.value;
 
-    // Закрываем WebApp
-    tg.close();
+    if (castingContact.type === "username") {
+        tg.openTelegramLink(`https://t.me/${v}`);
+    } else if (castingContact.type === "phone") {
+        tg.openTelegramLink(`https://t.me/+${v}`);
+    } else {
+        tg.openTelegramLink(`https://t.me/${v}`);
+    }
 
-    // Открываем чат в Telegram
-    setTimeout(() => {
-        if (castingContact.type === "username") {
-            window.open(`https://t.me/${v}`, "_blank");
-        } else if (castingContact.type === "phone") {
-            // Для телефонов создаем ссылку в формате Telegram
-            const cleanPhone = v.replace(/\D/g, ''); // Убираем все кроме цифр
-            window.open(`https://t.me/+${cleanPhone}`, "_blank");
-        } else {
-            window.open(`https://t.me/${v}`, "_blank");
-        }
-    }, 50);
+    tg.close(); // 👈 ВОТ ЭТО ДОБАВЬ
 }
 
 function updateChatButton() {
