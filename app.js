@@ -279,13 +279,11 @@ function renderCalendar() {
 /* ---------------- DAY ---------------- */
 
 function openDayPanel(dateStr) {
+    closeSheet(); // 🔥 важно
 
     selectedDate = dateStr;
 
-    const data = availability[dateStr] || {
-        status: "none",
-        note: ""
-    };
+    const data = availability[dateStr] || { status: "none", note: "" };
 
     document.getElementById("panelDate").innerText =
         new Date(dateStr).toLocaleDateString("ru-RU");
@@ -298,15 +296,10 @@ function openDayPanel(dateStr) {
 }
 
 function closeSheet() {
-
-    document.getElementById("dayPanel")
-        .classList.remove("open");
-
-    document.getElementById("profileSheet")
-        .classList.remove("open");
+    document.getElementById("dayPanel").classList.remove("open");
+    document.getElementById("profileSheet").classList.remove("open");
 
     const b = document.getElementById("sheetBackdrop");
-
     b.style.display = "none";
 }
 
@@ -352,6 +345,7 @@ function renderProfileButtons() {
 }
 
 function openProfileSheet(id) {
+    closeSheet(); // 🔥 важно
 
     currentProfileId = id;
 
