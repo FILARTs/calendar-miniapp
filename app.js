@@ -19,14 +19,17 @@ document.addEventListener("DOMContentLoaded", init);
 function normalizeContact(value) {
     if (!value) return null;
 
-    value = value.trim();
-
     if (value.startsWith("@")) {
-        return { type: "username", value: value.slice(1) };
+        return { type: "username", value: value.replace("@", "") };
     }
 
     if (value.startsWith("+")) {
-        return { type: "phone", value: value };
+        return {
+			type: value.startsWith("@") ? "username"
+				: value.startsWith("+") ? "phone"
+				: "username",
+			value: value.replace("@", "").replace("+", "")
+		};
     }
 
     return { type: "username", value };
@@ -74,15 +77,25 @@ function openCastingChat() {
 
     const v = castingContact.value;
 
-    if (castingContact.type === "username") {
-        tg.openTelegramLink(`https://t.me/${v}`);
-    } else if (castingContact.type === "phone") {
-        tg.openTelegramLink(`https://t.me/+${v}`);
-    } else {
-        tg.openTelegramLink(`https://t.me/${v}`);
-    }
+    // 🔥 СНАЧАЛА закрываем
+    tg.close();
 
-    tg.close(); // 👈 ВОТ ЭТО ДОБАВЬ
+    // 🔥 потом даём Telegram открыть чат
+    setTimeout(() => {
+
+        if (castingContact.type === "username") {
+            window.open(`https://t.me/${v}`, "_blank");
+            return;
+        }
+
+        if (castingContact.type === "phone") {
+            window.open(`https://t.me/+${v}`, "_blank");
+            return;
+        }
+
+        window.open(`https://t.me/${v}`, "_blank");
+
+    }, 50);
 }
 
 function updateChatButton() {
