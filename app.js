@@ -74,24 +74,20 @@ function openCastingChat() {
 
     const v = castingContact.value;
 
-    // 🔥 СНАЧАЛА закрываем
+    // Закрываем WebApp
     tg.close();
 
-    // 🔥 потом даём Telegram открыть чат
+    // Открываем чат в Telegram
     setTimeout(() => {
-
         if (castingContact.type === "username") {
             window.open(`https://t.me/${v}`, "_blank");
-            return;
+        } else if (castingContact.type === "phone") {
+            // Для телефонов создаем ссылку в формате Telegram
+            const cleanPhone = v.replace(/\D/g, ''); // Убираем все кроме цифр
+            window.open(`https://t.me/+${cleanPhone}`, "_blank");
+        } else {
+            window.open(`https://t.me/${v}`, "_blank");
         }
-
-        if (castingContact.type === "phone") {
-            window.open(`https://t.me/+${v}`, "_blank");
-            return;
-        }
-
-        window.open(`https://t.me/${v}`, "_blank");
-
     }, 50);
 }
 
