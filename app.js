@@ -19,15 +19,24 @@ document.addEventListener("DOMContentLoaded", init);
 function normalizeContact(value) {
     if (!value) return null;
 
-    if (value.startsWith("@")) {
-        return { type: "username", value: value.replace("@", "") };
+    value = value.trim();
+
+    // EMAIL — САМЫЙ ЖЁСТКИЙ ПРИОРИТЕТ
+    if (value.includes("@") && value.includes(".")) {
+        return { type: "email", value };
     }
 
-	if (value.startsWith("+")) {
-		return { type: "phone", value: value };
-	}
+    // TELEGRAM USERNAME
+    if (value.startsWith("@")) {
+        return { type: "username", value: value.slice(1) };
+    }
 
-    return { type: "username", value: value };
+    // PHONE
+    if (value.startsWith("+")) {
+        return { type: "phone", value };
+    }
+
+    return null;
 }
 
 async function init() {
@@ -64,25 +73,34 @@ async function init() {
 /* ---------------- CHAT ---------------- */
 
 function openCastingChat() {
-	
-    console.log("CLICK", castingContact);
 
     if (!castingContact?.value) {
         tg.showAlert("Нет контакта");
         return;
     }
 
-    const v = castingContact.value;
+    const { type, value } = castingContact;
 
-    if (castingContact.type === "username") {
-        tg.openTelegramLink(`https://t.me/${v}`);
-    } else if (castingContact.type === "phone") {
-        tg.openTelegramLink(`https://t.me/+${v}`);
-    } else {
-        tg.openTelegramLink(`https://t.me/${v}`);
-    }
+    tg.close();
 
-    tg.close(); // 👈 ВОТ ЭТО ДОБАВЬ
+    setTimeout(() => {
+
+        if (type === "username") {
+            window.open(`https://t.me/${value}`, "_blank");
+            return;
+        }
+
+        if (type === "phone") {
+            window.open(`https://t.me/${value}`, "_blank");
+            return;
+        }
+
+        if (type === "email") {
+            window.open(`mailto:${value}`, "_blank");
+            return;
+        }
+
+    }, 50);
 }
 
 function updateChatButton() {
