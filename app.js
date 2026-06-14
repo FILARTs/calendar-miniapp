@@ -64,7 +64,7 @@ async function init() {
 /* ---------------- CHAT ---------------- */
 
 function openCastingChat() {
-
+	
     console.log("CLICK", castingContact);
 
     if (!castingContact?.value) {
@@ -76,15 +76,13 @@ function openCastingChat() {
 
     if (castingContact.type === "username") {
         tg.openTelegramLink(`https://t.me/${v}`);
-        return;
-    }
-
-    if (castingContact.type === "phone") {
+    } else if (castingContact.type === "phone") {
         tg.openTelegramLink(`https://t.me/+${v}`);
-        return;
+    } else {
+        tg.openTelegramLink(`https://t.me/${v}`);
     }
 
-    tg.openTelegramLink(`https://t.me/${v}`);
+    tg.close(); // 👈 ВОТ ЭТО ДОБАВЬ
 }
 
 function updateChatButton() {
