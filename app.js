@@ -19,15 +19,17 @@ document.addEventListener("DOMContentLoaded", init);
 function normalizeContact(value) {
     if (!value) return null;
 
+    value = value.trim();
+
     if (value.startsWith("@")) {
-        return { type: "username", value: value.replace("@", "") };
+        return { type: "username", value: value.slice(1) };
     }
 
-	if (value.startsWith("+")) {
-		return { type: "phone", value: value };
-	}
+    if (value.startsWith("+")) {
+        return { type: "phone", value: value };
+    }
 
-    return { type: "username", value: value };
+    return { type: "username", value };
 }
 
 async function init() {
