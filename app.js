@@ -16,31 +16,24 @@ let castingContact = null;
 
 document.addEventListener("DOMContentLoaded", init);
 
-function normalizeContact(type, value) {
+function normalizeContact(value) {
     if (!value) return null;
 
-    if (type === "email") {
-        return { type: "email", value };
-    }
-
-    if (type === "phone") {
-        return { type: "phone", value };
-    }
-
-    if (type === "username") {
+    if (value.startsWith("@")) {
         return { type: "username", value: value.replace("@", "") };
     }
 
-    return null;
+	if (value.startsWith("+")) {
+		return { type: "phone", value: value };
+	}
+
+    return { type: "username", value: value };
 }
 
 async function init() {
 
     const params = new URLSearchParams(window.location.search);
-    castingContact = normalizeContact(
-    params.get("type"),
-    params.get("value")
-	);
+    castingContact = normalizeContact(params.get("contact"));
 
     gridEl = document.getElementById('calendar-grid');
     prevBtn = document.getElementById('prevMonth');
