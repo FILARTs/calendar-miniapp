@@ -85,7 +85,7 @@ function openCastingChat() {
     const v = castingContact.value;
 
     if (castingContact.type === "email") {
-        window.open(`mailto:${v}`, "_blank");
+        tg.openLink(`mailto:${v}`, "_blank");
     
         setTimeout(() => {
             tg.close();
