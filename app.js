@@ -161,6 +161,9 @@ function bindAutosave() {
 
     document.getElementById("noteInput")
         .addEventListener("input", debounce(saveCurrentDay, 500));
+
+    document.getElementById("profileInput")
+        .addEventListener("input", debounce(saveProfile, 500));
 }
 
 function debounce(fn, delay) {
@@ -367,7 +370,7 @@ function openProfileSheet(id) {
 
     const data = profiles[id] || { title: "", text: "" };
 
-    document.getElementById("profileTitle").innerText = `Анкета ${id}`;
+    document.getElementById("profileTitle").innerText = data.title || `Анкета ${id}`;
     document.getElementById("profileInput").value = data.text;
 
     document.getElementById("profileSheet").classList.add("open");
@@ -379,10 +382,10 @@ async function saveProfile() {
     const text = document.getElementById("profileInput").value;
     const title = document.getElementById("profileTitle").innerText;
 
-    profiles[currentProfileId] = {
-        title: title.replace("Анкета ", ""),
-        text
-    };
+	profiles[currentProfileId] = {
+		title,
+		text
+	};
 
     await fetch(`${API_URL}/api/profiles/${userId}`, {
         method: "POST",
@@ -390,7 +393,6 @@ async function saveProfile() {
         body: JSON.stringify(profiles)
     });
 
-    tg.showAlert("Анкета сохранена");
 }
 
 async function copyProfile() {
@@ -398,5 +400,4 @@ async function copyProfile() {
     const text = document.getElementById("profileInput").value;
     await navigator.clipboard.writeText(text);
 
-    tg.showAlert("Скопировано");
 }
