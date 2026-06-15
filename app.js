@@ -370,8 +370,11 @@ function openProfileSheet(id) {
 
     const data = profiles[id] || { title: "", text: "" };
 
-    document.getElementById("profileTitle").innerText = data.title || `Анкета ${id}`;
-    document.getElementById("profileInput").value = data.text;
+    document.getElementById("profileTitleInput").value =
+        data.title || "";
+
+    document.getElementById("profileInput").value =
+        data.text;
 
     document.getElementById("profileSheet").classList.add("open");
     document.getElementById("sheetBackdrop").style.display = "block";
@@ -379,20 +382,26 @@ function openProfileSheet(id) {
 
 async function saveProfile() {
 
-    const text = document.getElementById("profileInput").value;
-    const title = document.getElementById("profileTitle").innerText;
+    const title =
+        document.getElementById("profileTitleInput").value.trim();
 
-	profiles[currentProfileId] = {
-		title,
-		text
-	};
+    const text =
+        document.getElementById("profileInput").value;
+
+    profiles[currentProfileId] = {
+        title,
+        text
+    };
 
     await fetch(`${API_URL}/api/profiles/${userId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify(profiles)
     });
 
+    renderProfileButtons();
 }
 
 async function copyProfile() {

@@ -81,37 +81,39 @@
 
     <!-- ПАНЕЛЬ АНКЕТ -->
 
-    <div id="profileSheet" class="sheet">
+	<div id="profileSheet" class="sheet">
 
-        <div class="sheet-handle"></div>
+		<div class="sheet-handle"></div>
 
-        <h3 id="profileTitle">
-            Анкета
-        </h3>
+		<input
+			id="profileTitleInput"
+			class="tg-input"
+			placeholder="Название анкеты"
+		>
 
-        <textarea
-            id="profileInput"
-            class="tg-input"
-            placeholder="Введите текст анкеты..."
-        ></textarea>
+		<textarea
+			id="profileInput"
+			class="tg-input"
+			placeholder="Введите текст анкеты..."
+		></textarea>
 
-        <button
-            class="tg-button"
-            onclick="copyProfile()"
-        >
-            📋 Скопировать
-        </button>
+		<button
+			class="tg-button"
+			onclick="copyProfile()"
+		>
+			📋 Скопировать
+		</button>
 
-        <button
-            id="openChatBtn"
-            class="tg-button"
-            style="display:none;"
-            onclick="openCastingChat()"
-        >
-            ✈️ Отправить
-        </button>
+		<button
+			id="openChatBtn"
+			class="tg-button"
+			style="display:none;"
+			onclick="openCastingChat()"
+		>
+			✈️ Отправить
+		</button>
 
-    </div>
+	</div>
 
     <div id="sheetBackdrop"></div>
 
