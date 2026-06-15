@@ -21,14 +21,20 @@ function normalizeContact(value) {
 
     value = value.trim();
 
-    if (value.includes("@") && value.includes(".")) {
+    // 1. EMAIL — самый приоритетный и строгий
+    const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (emailRegex.test(value)) {
         return { type: "email", value };
     }
 
+    // 2. TELEGRAM username
     if (value.startsWith("@")) {
         return { type: "username", value: value.slice(1) };
     }
 
+    // 3. PHONE
     if (value.startsWith("+")) {
         return { type: "phone", value };
     }
