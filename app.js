@@ -164,6 +164,9 @@ function bindAutosave() {
 
     document.getElementById("profileInput")
         .addEventListener("input", debounce(saveProfile, 500));
+
+    document.getElementById("profileTitleInput")
+        .addEventListener("input", debounce(saveProfile, 500));	
 }
 
 function debounce(fn, delay) {
@@ -353,22 +356,36 @@ async function fetchProfiles() {
 
 function renderProfileButtons() {
 
+    const defaults = {
+        1: "Кино",
+        2: "Реклама",
+        3: "Другое"
+    };
+
     for (let i = 1; i <= 3; i++) {
 
-        const btn = document.querySelector(`[onclick="openProfileSheet(${i})"]`);
+        const btn = document.querySelector(
+            `[onclick="openProfileSheet(${i})"]`
+        );
+
         if (!btn) continue;
 
-        const title = profiles?.[i]?.title;
-        btn.innerText = title?.trim() ? title : `Анкета ${i}`;
+        btn.innerText =
+            profiles?.[i]?.title?.trim() ||
+            defaults[i];
     }
 }
 
 function openProfileSheet(id) {
-    closeSheet(); // 🔥 важно
+
+    closeSheet();
 
     currentProfileId = id;
 
-    const data = profiles[id] || { title: "", text: "" };
+    const data = profiles[id] || {
+        title: "",
+        text: ""
+    };
 
     document.getElementById("profileTitleInput").value =
         data.title || "";
@@ -376,17 +393,23 @@ function openProfileSheet(id) {
     document.getElementById("profileInput").value =
         data.text;
 
-    document.getElementById("profileSheet").classList.add("open");
-    document.getElementById("sheetBackdrop").style.display = "block";
+    document.getElementById("profileSheet")
+        .classList.add("open");
+
+    document.getElementById("sheetBackdrop")
+        .style.display = "block";
 }
 
 async function saveProfile() {
 
     const title =
-        document.getElementById("profileTitleInput").value.trim();
+        document.getElementById("profileTitleInput")
+        .value
+        .trim();
 
     const text =
-        document.getElementById("profileInput").value;
+        document.getElementById("profileInput")
+        .value;
 
     profiles[currentProfileId] = {
         title,
