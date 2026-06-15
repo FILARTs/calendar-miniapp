@@ -85,7 +85,9 @@ function openCastingChat() {
     const v = castingContact.value;
 
     if (castingContact.type === "email") {
-        window.location.href = `mailto:${v}`;
+        setTimeout(() => {
+            window.location.href = `mailto:${v}`;
+        }, 50);
         return;
     }
 
@@ -97,7 +99,6 @@ function openCastingChat() {
         tg.openTelegramLink(`https://t.me/${v}`);
     }
 
-    tg.close();
 }
 
 function updateChatButton() {
