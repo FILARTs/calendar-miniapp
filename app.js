@@ -85,12 +85,7 @@ function openCastingChat() {
     const v = castingContact.value;
 
     if (castingContact.type === "email") {
-        tg.openLink(`mailto:${v}`, "_blank");
-    
-        setTimeout(() => {
-            tg.close();
-        }, 500);
-    
+        Telegram.WebApp.openLink(`mailto:${v}`);
         return;
     }
 
