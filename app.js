@@ -98,6 +98,8 @@ function openCastingChat() {
     } else {
         tg.openTelegramLink(`https://t.me/${v}`);
     }
+    
+    tg.close(); // 👈 ВОТ ЭТО ДОБАВЬ
 
 }
 
