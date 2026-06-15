@@ -21,12 +21,16 @@ function normalizeContact(value) {
 
     value = value.trim();
 
+    if (value.includes("@") && value.includes(".")) {
+        return { type: "email", value };
+    }
+
     if (value.startsWith("@")) {
         return { type: "username", value: value.slice(1) };
     }
 
     if (value.startsWith("+")) {
-        return { type: "phone", value: value };
+        return { type: "phone", value };
     }
 
     return { type: "username", value };
@@ -74,6 +78,12 @@ function openCastingChat() {
 
     const v = castingContact.value;
 
+    if (castingContact.type === "email") {
+        window.location.href = `mailto:${v}`;
+        tg.close();
+        return;
+    }
+
     if (castingContact.type === "username") {
         tg.openTelegramLink(`https://t.me/${v}`);
     } else if (castingContact.type === "phone") {
@@ -82,7 +92,7 @@ function openCastingChat() {
         tg.openTelegramLink(`https://t.me/${v}`);
     }
 
-    tg.close(); // 👈 ВОТ ЭТО ДОБАВЬ
+    tg.close();
 }
 
 function updateChatButton() {
