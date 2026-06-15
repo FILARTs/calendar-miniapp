@@ -86,7 +86,7 @@ function openCastingChat() {
 
     if (castingContact.type === "email") {
         setTimeout(() => {
-            window.location.href = `mailto:${v}`;
+            window.open(`mailto:${v}`);
         }, 50);
         return;
     }
