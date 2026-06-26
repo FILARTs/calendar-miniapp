@@ -21,6 +21,14 @@ function normalizeContact(value) {
 
     value = value.trim();
 
+    // 0. TELEGRAM LINK (t.me/migogolev)
+    const tgLinkRegex = /t\.me\/([a-zA-Z0-9_]+)/;
+    const tgMatch = value.match(tgLinkRegex);
+
+    if (tgMatch) {
+        return { type: "username", value: tgMatch[1] };
+    }
+
     // 1. EMAIL — самый приоритетный и строгий
     const emailRegex =
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
