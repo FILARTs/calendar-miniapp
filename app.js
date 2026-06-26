@@ -83,6 +83,13 @@ function openCastingChat() {
     }
 
     const v = castingContact.value;
+	
+    // 🔥 ДОБАВЛЕНО: обработка t.me/migogolev
+    const cleaned = v
+        .trim()
+        .replace(/https?:\/\/t\.me\//, "")
+        .replace("t.me/", "")
+        .replace("@", "");
 
     if (castingContact.type === "email") {
         setTimeout(() => {
